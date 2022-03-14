@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebVr</title>
+    <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@3.0.3/dist/aframe-event-set-component.min.js"></script>
+    <!-- <script
+        src="https://rawgit.com/ngokevin/aframe-animation-component/master/dist/aframe-animation-component.min.js"></script> -->
+
+    <script>
+
+        var currentSelectedObject = null;
+
+        AFRAME.registerComponent('on-click', {
+
+            init: function () {
+
+                this.entities = [];
+
+                this.selectedObject = null;
+                this.selectedObjectclass = null;
+                this.selectedMaterial = null;
+                this.selectedMaterialclass = null;
+
+                if (this.data === null) {
+                    this.entities.push(this.el);
+                } else {
+                    this.entities = this.data;
+                }
+
+                this.el.addEventListener('click', function (evt) {
+
+
+                    if (evt.target.className == "objects") {
+                        this.selectedObject = evt.target.id;
+                        currentSelectedObject = evt.target.id;
+                        this.selectedObjectclass = evt.target.className;
+                    }
+                    else {
+                        this.selectedMaterial = evt.target.id;
+                        this.selectedMaterialclass = evt.target.className;
+                    }
+
+
+                    var sceneEl = document.querySelector('a-scene');
+                    console.log(sceneEl.querySelectorAll('.objects'));
+
+                    if (this.selectedObjectclass == "objects") {
+                        var objectList = sceneEl.querySelectorAll('.objects');
+
+                        for (let i = 0; i < objectList.length; i++) {
+
+                            if (objectList[i].id == this.selectedObject) {
+
+                                document.getElementById(this.selectedObject).setAttribute('material', 'opacity', 1)
+
+                            }
+                            else {
+
+                                document.getElementById(objectList[i].id).setAttribute('material', 'opacity', 0.3)
+                            }
+                        }
+
+
+                        var materialsList = sceneEl.querySelectorAll('.materials');
+                        for (let i = 0; i < materialsList.length; i++) {
+
+                            materialsList[i].object3D.visible = true;
+
+                        }
+                        document.getElementById('label').setAttribute('visible', 'true')
+                    }
+
+
+                    if (this.selectedMaterialclass == "materials") {
+
+                        var color = document.getElementById(this.selectedMaterial).getAttribute("material");
+                        document.getElementById(currentSelectedObject).setAttribute('material', color);
+                    }
+
+                });
+
+
+                this.el.addEventListener('mouseenter', function (evt) {
+
+
+                    if (evt.target.className == "materials") {
+
+
+                        setInterval(function () { rotateobject(); }, 100);
+
+                        function rotateobject() {
+                            let rotation = evt.target.getAttribute('rotation');
+                            rotation.y += 360;
+                            evt.target.setAttribute('animation', 'property: rotation; to: 0 360 0 ; loop: true; dur: 2000');
+                        }
+                    }
+
+                });
+
+
+                this.el.addEventListener('mouseleave', function (evt) {
+
+
+                    if (evt.target.className == "materials") {
+
+                        evt.target.setAttribute('animation', '');
+                    }
+
+                });
+
+            },
+
+        });
+    </script>
+
+
+</head>
+
+<body>
+
+    <a-scene>
+
+        <a-cylinder position="-1.5 0.5 -2" material="opacity:1; transparent:true" class="objects" id="cylinder1"
+            scale="1 3 1" color="#ffffff" on-click="">
+        </a-cylinder>
+        <a-sphere position="1.5 0.5 -2" material="opacity:1; transparent:true" class="objects" color="#ffffff"
+            id="sphere1" on-click="">
+        </a-sphere>
+
+        <a-box position="0 0.5 1" material="opacity:1; transparent:true" class="objects" scale="2 1 1" id="box1"
+            color="#bf9c7e" on-click="">
+        </a-box>
+
+
+        <a-cylinder position="-1.5 0.5 3" material="opacity:1; transparent:true" class="objects" id="cylinder2"
+            scale="1 0.5 0.5" color="#bf9c7e" on-click="">
+        </a-cylinder>
+
+        <a-box position="1 0.5 3" class="objects" material="opacity:1; transparent:true" id="box2" scale="1.5 0.6 0.2"
+            color="#ffffff" on-click=""></a-box>
+
+
+        <a-sphere position="0 2.5 1" class="materials" id="redcolor" scale="0.25 0.25 0.25" on-click="" visible="false"
+            material="src:images/red.jpg" animation="">
+
+
+        </a-sphere>
+        <a-sphere position="0.8 2.5 1" class="materials" id="browncolor" scale="0.25 0.25 0.25" on-click=""
+            visible="false" material="src:images/brown.jpg" animation="">
+        </a-sphere>
+        <a-sphere position="1.6 2.5 1" class="materials" id="orangecolor" scale="0.25 0.25 0.25" on-click=""
+            visible="false" material="src:images/yellow.jpg" animation="">
+        </a-sphere>
+        <a-sphere position="2.4 2.5 1" class="materials" id="bluecolor" scale="0.25 0.25 0.25" on-click=""
+            visible="false" material="src:images/blue.jpg" animation="">
+        </a-sphere>
+        <a-sphere position="3.2 2.5 1" class="materials" id="blackcolor" scale="0.25 0.25 0.25" on-click=""
+            visible="false" material="src:images/black.jpg" animation="">
+        </a-sphere>
+        <a-sphere position="4 2.5 1" class="materials" id="pinkcolor" scale="0.25 0.25 0.25" on-click="" visible="false"
+            material="src:images/pink.jpg" animation="">
+        </a-sphere>
+
+        <a-text position="0 3 1" color="brown" scale="0.5 0.5 0.5" id="label" visible="false"
+            value="Select a different material">
+        </a-text>
+
+        <a-plane rotation="-90 0 0" width="8" height="8" color="#bdbdbd"></a-plane>
+
+        <a-plane rotation="-180 -180 0" position="1 3 -3" width="10" height="8" color="#d2b9a4"></a-plane>
+
+        <a-sky color="#ECECEC"></a-sky>
+
+        <a-camera position="0 1.5 6">
+            <a-cursor geometry="primitive: ring" material="color: #6fb2e7;    shader: flat"></a-cursor>
+        </a-camera>
+    </a-scene>
+
+
+
+</body>
+
+</html>
